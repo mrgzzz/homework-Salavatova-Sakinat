@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Генератор паролей</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .window {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        h2 {
+            color: #2a5298;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .option-label input {
+            margin-right: 8px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            flex: 1;
+            transition: all 0.3s;
+        }
+        
+        .generate-btn {
+            background: #2a5298;
+            color: white;
+        }
+        
+        .generate-btn:hover {
+            background: #1e3c72;
+        }
+        
+        .copy-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .copy-btn:hover {
+            background: #218838;
+        }
+        
+        #password {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            background: #f8f9fa;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="window">
+        <h2>Генератор паролей</h2>
+        
+        <div class="form-group">
+            <label for="length">Длина пароля:</label>
+            <input type="number" id="length" value="12" min="4" max="50">
+        </div>
+        
+        <div class="options">
+            <label class="option-label">
+                <input type="checkbox" id="uppercase" checked> A-Z (заглавные)
+            </label>
+            <label class="option-label">
+                <input type="checkbox" id="lowercase" checked> a-z (строчные)
+            </label>
+            <label class="option-label">
+                <input type="checkbox" id="numbers" checked> 0-9 (цифры)
+            </label>
+            <label class="option-label">
+                <input type="checkbox" id="symbols"> !@#$% (символы)
+            </label>
+        </div>
+        
+        <div class="button-group">
+            <button class="generate-btn" onclick="generatePassword()">Сгенерировать пароль</button>
+        </div>
+        
+        <input type="text" id="password" readonly>
+        
+        <div class="button-group">
+            <button class="copy-btn" onclick="copyPassword()">Копировать пароль</button>
+        </div>
+    </div>
+
+    <script>
+        function generatePassword() {
+            const length = parseInt(document.getElementById('length').value);
+            const uppercase = document.getElementById('uppercase').checked;
+            const lowercase = document.getElementById('lowercase').checked;
+            const numbers = document.getElementById('numbers').checked;
+            const symbols = document.getElementById('symbols').checked;
+
+            let charset = '';
+            if (uppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (lowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
+            if (numbers) charset += '0123456789';
+            if (symbols) charset += '!@#$%^&*()';
+
+            if (charset === '') {
+                alert('Выберите хотя бы один тип символов!');
+                return;
+            }
+
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * charset.length);
+                password += charset[randomIndex];
+            }
+
+            document.getElementById('password').value = password;
+        }
+
+        function copyPassword() {
+            const passwordField = document.getElementById('password');
+            if (!passwordField.value) {
+                alert('Сначала сгенерируйте пароль!');
+                return;
+            }
+            
+            passwordField.select();
+            document.execCommand('copy');
+            alert('Пароль скопирован в буфер обмена!');
+        }
+
+        // Генерируем пароль при загрузке
+        generatePassword();
+    </script>
+</body>
+</html>

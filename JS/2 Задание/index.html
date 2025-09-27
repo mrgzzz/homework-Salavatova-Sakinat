@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Функция-мемоизатор</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .window {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 90%;
+        }
+        
+        h2 {
+            color: #2a5298;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #2a5298;
+            color: white;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #1e3c72;
+        }
+        
+        .result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            border-left: 4px solid #2a5298;
+        }
+        
+        .log {
+            background: #f1f3f4;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-family: monospace;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+        
+        .explanation {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="window">
+        <h2>Функция-мемоизатор</h2>
+        
+        <div class="explanation">
+            <strong>Мемоизация</strong> - кэширование результатов вызовов функций 
+            для избежания повторных вычислений с одинаковыми аргументами.
+        </div>
+        
+        <div class="form-group">
+            <label for="numberInput">Введите число для вычисления квадрата:</label>
+            <input type="number" id="numberInput" value="5">
+        </div>
+        
+        <button onclick="testMemoization()">Вычислить квадрат</button>
+        <button onclick="clearLog()">Очистить лог</button>
+        
+        <div class="result">
+            <strong>Результат:</strong>
+            <div id="result"></div>
+        </div>
+        
+        <div class="log">
+            <strong>Лог вычислений:</strong>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script>
+        // memoizer.js
+        function memoize(fn) {
+            const cache = {};
+            
+            return function(...args) {
+                const key = JSON.stringify(args);
+                
+                if (key in cache) {
+                    logMessage(`Возвращаем результат из кэша для аргументов: ${args}`);
+                    return cache[key];
+                } else {
+                    logMessage(`Вычисляем результат для аргументов: ${args}`);
+                    const result = fn.apply(this, args);
+                    cache[key] = result;
+                    return result;
+                }
+            };
+        }
+
+        // Функция для вычисления квадрата
+        function expensiveCalculation(n) {
+            logMessage(`Выполняются сложные вычисления для ${n}...`);
+            // Имитация задержки для наглядности
+            let result = 0;
+            for (let i = 0; i < 100000000; i++) {
+                result = n * n;
+            }
+            return result;
+        }
+
+        // Создаем мемоизированную версию функции
+        const memoizedCalculation = memoize(expensiveCalculation);
+
+        // Функция для логирования в интерфейс
+        function logMessage(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}<br>`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        // Функция для тестирования мемоизации
+        function testMemoization() {
+            const input = parseInt(document.getElementById('numberInput').value);
+            const result = memoizedCalculation(input);
+            document.getElementById('result').textContent = `Квадрат числа ${input} = ${result}`;
+        }
+
+        // Функция для очистки лога
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+            document.getElementById('result').textContent = '';
+        }
+
+        // Тестируем при загрузке
+        testMemoization();
+    </script>
+</body>
+</html>
