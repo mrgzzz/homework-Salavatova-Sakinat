@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Форма регистрации</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        input.valid {
+            border-color: #28a745;
+        }
+
+        input.invalid {
+            border-color: #dc3545;
+        }
+
+        .error {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+            min-height: 20px;
+        }
+
+        .success {
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 5px;
+            display: block;
+            min-height: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Регистрация</h1>
+        <form id="registrationForm">
+            <div class="form-group">
+                <label for="name">Имя:</label>
+                <input type="text" id="name" name="name" placeholder="Введите ваше имя">
+                <span class="error" id="nameError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" placeholder="Введите ваш email">
+                <span class="error" id="emailError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" name="password" placeholder="Введите пароль">
+                <span class="error" id="passwordError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Подтверждение пароля:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Подтвердите пароль">
+                <span class="error" id="confirmPasswordError"></span>
+            </div>
+
+            <button type="submit" id="submitBtn" disabled>Зарегистрироваться</button>
+        </form>
+    </div>
+
+    <script>
+        // Находим элементы DOM
+        const form = document.getElementById('registrationForm');
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const submitBtn = document.getElementById('submitBtn');
+
+        const nameError = document.getElementById('nameError');
+        const emailError = document.getElementById('emailError');
+        const passwordError = document.getElementById('passwordError');
+        const confirmPasswordError = document.getElementById('confirmPasswordError');
+
+        // Валидность полей
+        const validationState = {
+            name: false,
+            email: false,
+            password: false,
+            confirmPassword: false
+        };
+
+        /Валидация имени @returns {boolean} true если валидно, false если нет/
+        function validateName() {
+            const name = nameInput.value.trim();
+            const nameRegex = /^[A-Za-zА-Яа-яЁё\s]{2,}$/;
+
+            if (name.length < 2) {
+                showError(nameInput, nameError, 'Имя должно содержать минимум 2 символа');
+                return false;
+            }
+
+            if (!nameRegex.test(name)) {
+                showError(nameInput, nameError, 'Имя может содержать только буквы и пробелы');
+                return false;
+            }
+
+            showSuccess(nameInput, nameError);
+            return true;
+        }
+
+        /Валидация email @returns {boolean} true если валидно, false если нет/
+        function validateEmail() {
+            const email = emailInput.value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailRegex.test(email)) {
+                showError(emailInput, emailError, 'Введите корректный email адрес');
+                return false;
+            }
+
+            showSuccess(emailInput, emailError);
+            return true;
+        }
+
+        /Валидация пароля @returns {boolean} true если валидно, false если нет/
+        function validatePassword() {
+            const password = passwordInput.value;
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasNumber = /\d/.test(password);
+
+            if (password.length < 8) {
+                showError(passwordInput, passwordError, 'Пароль должен содержать минимум 8 символов');
+                return false;
+            }
+
+            if (!hasUpperCase) {
+                showError(passwordInput, passwordError, 'Пароль должен содержать хотя бы одну заглавную букву');
+                return false;
+            }
+
+            if (!hasNumber) {
+                showError(passwordInput, passwordError, 'Пароль должен содержать хотя бы одну цифру');
+                return false;
+            }
+
+            showSuccess(passwordInput, passwordError);
+            
+            // Если поле подтверждения пароля уже заполнено, проверяем совпадение
+            if (confirmPasswordInput.value) {
+                validateConfirmPassword();
+            }
+
+            return true;
+        }
+
+        /Валидация подтверждения пароля @returns {boolean} true если валидно, false если нет/
+        function validateConfirmPassword() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+
+            if (confirmPassword !== password) {
+                showError(confirmPasswordInput, confirmPasswordError, 'Пароли не совпадают');
+                return false;
+            }
+
+            showSuccess(confirmPasswordInput, confirmPasswordError);
+            return true;
+        }
+
+        /Показывает сообщение об ошибке/
+        function showError(input, errorElement, message) {
+            input.classList.remove('valid');
+            input.classList.add('invalid');
+            errorElement.textContent = message;
+            errorElement.className = 'error';
+        }
+
+        /Показывает успешную валидацию/
+        function showSuccess(input, errorElement) {
+            input.classList.remove('invalid');
+            input.classList.add('valid');
+            errorElement.textContent = '';
+            errorElement.className = 'success';
+        }
+
+        /Обновляет состояние кнопки отправки/
+        function updateSubmitButton() {
+            const isValid = Object.values(validationState).every(state => state);
+            submitBtn.disabled = !isValid;
+        }
+
+        /Обработчик отправки формы/
+        function handleSubmit(event) {
+            event.preventDefault();
+            
+            // Финальная проверка всех полей
+            const isNameValid = validateName();
+            const isEmailValid = validateEmail();
+            const isPasswordValid = validatePassword();
+            const isConfirmPasswordValid = validateConfirmPassword();
+
+            if (isNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid) {
+                alert('Форма успешно отправлена!');
+                form.reset();
+                
+                // Сбрасываем стили полей
+                const inputs = form.querySelectorAll('input');
+                inputs.forEach(input => {
+                    input.classList.remove('valid', 'invalid');
+                });
+                
+                // Сбрасываем сообщения об ошибках
+                const errorElements = form.querySelectorAll('.error, .success');
+                errorElements.forEach(element => {
+                    element.textContent = '';
+                    element.className = 'error';
+                });
+                
+                // Блокируем кнопку
+                submitBtn.disabled = true;
+            }
+        }
+        nameInput.addEventListener('input', function() {
+            validationState.name = validateName();
+            updateSubmitButton();
+        });
+
+        emailInput.addEventListener('input', function() {
+            validationState.email = validateEmail();
+            updateSubmitButton();
+        });
+
+        passwordInput.addEventListener('input', function() {
+            validationState.password = validatePassword();
+            updateSubmitButton();
+        });
+
+        confirmPasswordInput.addEventListener('input', function() {
+            validationState.confirmPassword = validateConfirmPassword();
+            updateSubmitButton();
+        });
+
+        // Обработчик отправки формы
+        form.addEventListener('submit', handleSubmit);
+    </script>
+</body>
+</html>
